@@ -37,9 +37,10 @@ download_release() {
 	local version filename url
 	version="$1"
 	filename="$2"
+	platform=$(get_platform)
+	arch=$(get_arch)
 
-	# TODO: Adapt the release URL convention for atuin
-	url="$GH_REPO/archive/v${version}.tar.gz"
+	url="$GH_REPO/releases/download/v${version}/atuin-v${version}-${arch}-${platform}.tar.gz"
 
 	echo "* Downloading $TOOL_NAME release $version..."
 	curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
@@ -67,4 +68,51 @@ install_version() {
 		rm -rf "$install_path"
 		fail "An error occurred while installing $TOOL_NAME $version."
 	)
+}
+
+get_arch() {
+	local arch=""
+
+	case "$(uname -m)" in
+		x86_64|amd64) arch="x86_64" ;;
+		aarch64|arm64) arch="aarch64" ;;
+		*)
+			fail "Sorry, this plugin version (and possibly also atuin) does not support arch '$(uname -m)'"
+			;;
+	esac
+
+	if [[ $platform == "unknown-linux-musl" ]]; then
+		arch="x86_64"
+	fi
+
+	echo -n $arch
+}
+
+get_platform() {
+	local platform=""
+
+	case "$(uname -s | tr '[:upper:]' '[:lower:]')" in
+		darwin) platform="apple-darwin" ;;
+		linux)
+			if wants_musl; then
+				platform="unknown-linux-musl"
+			else
+				platform="unknown-linux-gnu"
+			fi ;;
+		*)
+			fail "Sorry, this plugin version (and possibly also atuin) does not support $(uname -s)"
+			;;
+	esac
+
+	echo -n $platform
+}
+
+wants_musl() {
+	if ldd "/bin/ls" | grep -q "musl"; then
+		# musl linked
+		true
+	else
+		# not a musl system
+		false
+	fi
 }
