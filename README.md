@@ -15,10 +15,8 @@
 
 # Dependencies
 
-**TODO: adapt this section**
-
 - `bash`, `curl`, `tar`: generic POSIX utilities.
-- `SOME_ENV_VAR`: set this environment variable in your shell config to load the correct version of tool x.
+- `ldd` if running on Linux, to determine whether to use atuin's musl binary
 
 # Install
 
@@ -53,7 +51,7 @@ install & manage versions.
 
 Contributions of any kind welcome! See the [contributing guide](contributing.md).
 
-[Thanks goes to these contributors](https://github.com/irons/asdf-atuin/graphs/contributors)!
+[Thanks go to these contributors](https://github.com/irons/asdf-atuin/graphs/contributors)!
 
 # License
 
